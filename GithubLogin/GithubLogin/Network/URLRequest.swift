@@ -21,7 +21,7 @@ enum HTTPMethod: CustomStringConvertible {
 }
 
 extension URLRequest {
-    init(url: URL, method: HTTPMethod, token: String? = nil) {
+    init(url: URL, method: HTTPMethod) {
         self.init(url: url)
         setValue("application/json",
                  forHTTPHeaderField: "Content-Type")

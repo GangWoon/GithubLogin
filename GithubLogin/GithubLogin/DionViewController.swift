@@ -7,15 +7,20 @@
 //
 
 import UIKit
+import Combine
 
 final class DionViewController: UIViewController {
+    
     static let identifier: String = "DionViewController"
+    var cancellable: AnyCancellable?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        GithubLoginUseCase.shared.request(request: URLRequest(url: Endpoint(path: .labels).url!, method: .GET)) { data, _, _ in
-            guard let data = data else { return }
-            print(String(data: data, encoding: .utf8))
+        let request = URLRequest(url: Endpoint(path: .labels).url!, method: .GET)
+        cancellable = GithubLoginUseCase.shared
+            .request(request: request)
+            .sink(receiveCompletion: { _ in }) { data, _ in
+                print(String(data: data, encoding: .utf8))
         }
     }
 }

@@ -10,16 +10,13 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-    }
-    
+    // MARK: - Lifecycle
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.navigationBar.isHidden = true
     }
     
+    // MARK: - IBACtions
     @IBAction func requestLogin(_ sender: UIButton) {
         guard let githubLoginViewController = storyboard?.instantiateViewController(identifier: GithubLoginViewController.identifier) as? GithubLoginViewController else { return }
         githubLoginViewController.modalPresentationStyle = .fullScreen

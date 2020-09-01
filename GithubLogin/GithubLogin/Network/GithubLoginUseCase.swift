@@ -7,26 +7,30 @@
 //
 
 import Foundation
+import Combine
 
 protocol GithubLoginNetWork {
     var session: URLSession { get }
     
-    func request(request: URLRequest, completion: @escaping (Data?, URLResponse?, Error?) -> Void)
+    func request(request: URLRequest) -> AnyPublisher<(data: Data, response: URLResponse), URLError>
 }
 
 
 struct GithubLoginUseCase: GithubLoginNetWork {
     
+    // MARK: - Properties
     static var shared: GithubLoginUseCase = .init()
     var session: URLSession
     
+    // MARK: - Lifecycle
     init(session: URLSession = .shared) {
         self.session = session
     }
     
-    func request(request: URLRequest, completion: @escaping (Data?, URLResponse?, Error?) -> Void) {
-        session.dataTask(with: request, completionHandler: completion)
-            .resume()
+    // MARK: - Methods
+    func request(request: URLRequest) -> AnyPublisher<(data: Data, response: URLResponse), URLError> {
+        return session.dataTaskPublisher(for: request)
+            .eraseToAnyPublisher()
     }
 }
 

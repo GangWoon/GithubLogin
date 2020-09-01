@@ -8,6 +8,7 @@
 
 import UIKit
 import WebKit
+import Combine
 
 protocol GithubLoginViewControllerDelegate: NSObject {
     func loginCompleted()
@@ -15,6 +16,7 @@ protocol GithubLoginViewControllerDelegate: NSObject {
 
 final class GithubLoginViewController: UIViewController {
     
+    // MARK: - Properties
     static let identifier: String = "GithubLoginViewController"
     @IBOutlet weak var webView: WKWebView! {
         didSet {
@@ -22,7 +24,9 @@ final class GithubLoginViewController: UIViewController {
         }
     }
     weak var delegate: GithubLoginViewControllerDelegate?
+    var cancellable: AnyCancellable?
     
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         webView.load(URLRequest(url: Endpoint(path: .githubLogin).url!))
@@ -38,10 +42,12 @@ extension GithubLoginViewController: WKNavigationDelegate {
                 return
         }
         decisionHandler(.cancel)
-        webView.getToken {
-            UserDefaults.standard.set($0, forKey: "token")
+        cancellable = WKWebView.TokenPublisher()
+            .sink(receiveCompletion: { _ in }) { token in
+                UserDefaults.standard
+                    .set(token,
+                         forKey: "token")
         }
-
         dismiss(animated: true) { [weak self] in
             self?.delegate?.loginCompleted()
         }
